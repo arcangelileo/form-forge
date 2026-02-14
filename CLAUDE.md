@@ -1,8 +1,9 @@
 # FormForge
 
-Phase: SCAFFOLDING
+Phase: DEVELOPMENT
 
 ## Project Spec
+- **Repo**: https://github.com/arcangelileo/form-forge
 - **Idea**: FormForge is a form backend-as-a-service that gives developers and marketers instant API endpoints for HTML forms. Point any `<form>` tag at a FormForge endpoint, and submissions are captured, stored, and forwarded via email — no server code needed. Users get a dashboard to view, search, and export submissions, manage multiple forms/projects, configure email notifications and spam filtering, and generate embeddable form snippets. Think Formspree or Basin, but self-hostable and simple.
 - **Target users**: Frontend developers, indie hackers, agencies, and marketers who build static sites, landing pages, and JAMstack apps and need a reliable form backend without writing server code.
 - **Revenue model**: Freemium with usage tiers. Free tier: 1 form, 50 submissions/month. Starter ($9/mo): 10 forms, 1,000 submissions/month, email notifications. Pro ($29/mo): unlimited forms, 10,000 submissions/month, custom thank-you redirects, file uploads, webhooks, CSV/JSON export.
@@ -32,9 +33,9 @@ Phase: SCAFFOLDING
 - **Rate limiting**: In-memory for MVP, Redis for production scale
 
 ## Task Backlog
-- [ ] Create GitHub repo and initial project structure (pyproject.toml, src/app/, alembic)
-- [ ] Set up FastAPI app skeleton with health check and configuration
-- [ ] Create database models (User, Form, Submission) and Alembic migrations
+- [x] Create GitHub repo and initial project structure (pyproject.toml, src/app/, alembic)
+- [x] Set up FastAPI app skeleton with health check and configuration
+- [x] Create database models (User, Form, Submission) and Alembic migrations
 - [ ] Implement user registration and login (JWT auth with httponly cookies)
 - [ ] Build form CRUD API (create, list, update, delete form endpoints)
 - [ ] Implement form submission endpoint (`POST /f/{form_uuid}`) with CORS
@@ -54,8 +55,47 @@ Phase: SCAFFOLDING
 - Created spec and backlog
 - Key differentiator: simple, self-hostable, developer-friendly form endpoints
 
+### Session 2 — SCAFFOLDING
+- Created GitHub repo and project structure
+- Set up pyproject.toml with all dependencies (FastAPI, SQLAlchemy, Alembic, etc.)
+- Created FastAPI app skeleton with `/health` endpoint
+- Created config module with pydantic-settings (env-var driven)
+- Created database models: User, Form, Submission (async SQLAlchemy)
+- Set up Alembic with async SQLAlchemy support
+- Created test infrastructure (conftest.py with test DB isolation)
+- Health check tests passing (2/2)
+- Phase changed to DEVELOPMENT
+
 ## Known Issues
 (none yet)
 
 ## Files Structure
-(will be updated as files are created)
+```
+form-forge/
+├── CLAUDE.md
+├── .gitignore
+├── .env.example
+├── pyproject.toml
+├── alembic.ini
+├── alembic/
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+├── src/
+│   └── app/
+│       ├── __init__.py
+│       ├── main.py          # FastAPI app, lifespan, health check
+│       ├── config.py         # Settings via pydantic-settings
+│       ├── database.py       # Async SQLAlchemy engine & session
+│       ├── models.py         # User, Form, Submission models
+│       ├── routers/
+│       │   └── __init__.py
+│       ├── static/
+│       │   └── .gitkeep
+│       └── templates/
+│           └── .gitkeep
+└── tests/
+    ├── __init__.py
+    ├── conftest.py           # Test DB setup, async client fixture
+    └── test_health.py        # Health endpoint tests
+```
