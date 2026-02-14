@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — FormForge{% endblock %}
+
+{% block body %}
+<!-- Nav -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-14 items-center">
+            <a href="/dashboard" class="flex items-center gap-2">
+                <div class="w-7 h-7 bg-brand-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <span class="text-lg font-bold text-gray-900">FormForge</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-600 hidden sm:block">{{ user.name }}</span>
+                <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-brand-100 text-brand-700 capitalize">{{ user.plan }}</span>
+                <button onclick="logout()" class="text-sm text-gray-500 hover:text-gray-700 transition">Log out</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm text-gray-500 mb-1">Total Forms</p>
+            <p class="text-2xl font-bold text-gray-900">{{ total_forms }}</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm text-gray-500 mb-1">Total Submissions</p>
+            <p class="text-2xl font-bold text-gray-900">{{ total_submissions }}</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm text-gray-500 mb-1">Plan</p>
+            <p class="text-2xl font-bold text-gray-900 capitalize">{{ user.plan }}</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Your Forms</h1>
+        <button onclick="openCreateModal()" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition shadow-sm">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            New Form
+        </button>
+    </div>
+
+    <!-- Forms list -->
+    {% if forms %}
+    <div class="grid gap-4">
+        {% for item in forms %}
+        <div class="bg-white rounded-xl border border-gray-200 p-5 hover:border-brand-200 transition fade-in">
+            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-3 mb-2">
+                        <a href="/dashboard/forms/{{ item.form.id }}" class="text-lg font-semibold text-gray-900 hover:text-brand-600 transition truncate">{{ item.form.name }}</a>
+                        {% if item.form.is_active %}
+                        <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">Active</span>
+                        {% else %}
+                        <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-500">Inactive</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                        <span>{{ item.submission_count }} submission{{ 's' if item.submission_count != 1 }}</span>
+                        <span class="hidden sm:inline">&middot;</span>
+                        <code class="text-xs bg-gray-100 px-2 py-0.5 rounded font-mono">{{ settings.base_url }}/f/{{ item.form.uuid }}</code>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="/dashboard/forms/{{ item.form.id }}" class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">View</a>
+                    <button onclick="openEditModal({{ item.form.id }}, '{{ item.form.name }}', '{{ item.form.allowed_origins }}', '{{ item.form.redirect_url or '' }}', {{ 'true' if item.form.email_notifications else 'false' }}, '{{ item.form.notification_email or '' }}')"
+                        class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">Edit</button>
+                    <button onclick="deleteForm({{ item.form.id }}, '{{ item.form.name }}')"
+                        class="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition">Delete</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+        <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No forms yet</h3>
+        <p class="text-gray-500 mb-6">Create your first form endpoint to start collecting submissions.</p>
+        <button onclick="openCreateModal()" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition shadow-sm">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Create your first form
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Create/Edit Modal -->
+<div id="form-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-5">
+                <h2 id="modal-title" class="text-lg font-bold text-gray-900">Create Form</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="form-form" class="space-y-4">
+                <input type="hidden" id="form-id" value="">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Form name</label>
+                    <input type="text" id="form-name" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm"
+                        placeholder="e.g. Contact Form, Newsletter Signup">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Allowed origins</label>
+                    <input type="text" id="form-origins"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm"
+                        placeholder="* (all) or https://yoursite.com" value="*">
+                    <p class="mt-1 text-xs text-gray-500">Comma-separated origins or * to allow all</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Redirect URL (optional)</label>
+                    <input type="url" id="form-redirect"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm"
+                        placeholder="https://yoursite.com/thank-you">
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="form-notifications" checked
+                        class="w-4 h-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500">
+                    <label for="form-notifications" class="text-sm text-gray-700">Email notifications on new submissions</label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notification email (optional)</label>
+                    <input type="email" id="form-notification-email"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm"
+                        placeholder="Defaults to your account email">
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition text-sm">Cancel</button>
+                    <button type="submit" id="form-submit-btn" class="flex-1 px-4 py-2 bg-brand-600 text-white font-medium rounded-lg hover:bg-brand-700 transition text-sm">Create Form</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openCreateModal() {
+    document.getElementById('modal-title').textContent = 'Create Form';
+    document.getElementById('form-submit-btn').textContent = 'Create Form';
+    document.getElementById('form-id').value = '';
+    document.getElementById('form-name').value = '';
+    document.getElementById('form-origins').value = '*';
+    document.getElementById('form-redirect').value = '';
+    document.getElementById('form-notifications').checked = true;
+    document.getElementById('form-notification-email').value = '';
+    document.getElementById('form-modal').classList.remove('hidden');
+}
+
+function openEditModal(id, name, origins, redirect, notifications, notifEmail) {
+    document.getElementById('modal-title').textContent = 'Edit Form';
+    document.getElementById('form-submit-btn').textContent = 'Save Changes';
+    document.getElementById('form-id').value = id;
+    document.getElementById('form-name').value = name;
+    document.getElementById('form-origins').value = origins;
+    document.getElementById('form-redirect').value = redirect;
+    document.getElementById('form-notifications').checked = notifications;
+    document.getElementById('form-notification-email').value = notifEmail;
+    document.getElementById('form-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('form-modal').classList.add('hidden');
+}
+
+document.getElementById('form-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('form-id').value;
+    const data = {
+        name: document.getElementById('form-name').value,
+        allowed_origins: document.getElementById('form-origins').value,
+        redirect_url: document.getElementById('form-redirect').value || null,
+        email_notifications: document.getElementById('form-notifications').checked,
+        notification_email: document.getElementById('form-notification-email').value || null,
+    };
+
+    try {
+        if (id) {
+            await apiCall(`/api/forms/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+            showToast('Form updated successfully');
+        } else {
+            await apiCall('/api/forms/', { method: 'POST', body: JSON.stringify(data) });
+            showToast('Form created successfully');
+        }
+        closeModal();
+        setTimeout(() => window.location.reload(), 500);
+    } catch (e) {}
+});
+
+async function deleteForm(id, name) {
+    if (!confirm(`Are you sure you want to delete "${name}"? This will also delete all submissions.`)) return;
+    try {
+        await apiCall(`/api/forms/${id}`, { method: 'DELETE' });
+        showToast('Form deleted');
+        setTimeout(() => window.location.reload(), 500);
+    } catch (e) {}
+}
+
+async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/';
+}
+
+// Close modal on escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});
+// Close modal on backdrop click
+document.getElementById('form-modal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+});
+</script>
+{% endblock %}

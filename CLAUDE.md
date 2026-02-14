@@ -1,6 +1,6 @@
 # FormForge
 
-Phase: DEVELOPMENT
+Phase: QA
 
 ## Project Spec
 - **Repo**: https://github.com/arcangelileo/form-forge
@@ -36,18 +36,18 @@ Phase: DEVELOPMENT
 - [x] Create GitHub repo and initial project structure (pyproject.toml, src/app/, alembic)
 - [x] Set up FastAPI app skeleton with health check and configuration
 - [x] Create database models (User, Form, Submission) and Alembic migrations
-- [ ] Implement user registration and login (JWT auth with httponly cookies)
-- [ ] Build form CRUD API (create, list, update, delete form endpoints)
-- [ ] Implement form submission endpoint (`POST /f/{form_uuid}`) with CORS
-- [ ] Build dashboard UI — form list, submission viewer with search and pagination
-- [ ] Add email notification system (background job on new submission)
-- [ ] Implement spam protection (honeypot + rate limiting)
-- [ ] Add CSV export for form submissions
-- [ ] Build embeddable snippet generator UI
-- [ ] Create public landing page with feature list and pricing
-- [ ] Write comprehensive tests (auth, submissions, API, spam)
-- [ ] Write Dockerfile and docker-compose.yml
-- [ ] Write README with setup and deploy instructions
+- [x] Implement user registration and login (JWT auth with httponly cookies)
+- [x] Build form CRUD API (create, list, update, delete form endpoints)
+- [x] Implement form submission endpoint (`POST /f/{form_uuid}`) with CORS
+- [x] Build dashboard UI — form list, submission viewer with search and pagination
+- [x] Add email notification system (background job on new submission)
+- [x] Implement spam protection (honeypot + rate limiting)
+- [x] Add CSV export for form submissions
+- [x] Build embeddable snippet generator UI
+- [x] Create public landing page with feature list and pricing
+- [x] Write comprehensive tests (auth, submissions, API, spam)
+- [x] Write Dockerfile and docker-compose.yml
+- [x] Write README with setup and deploy instructions
 
 ## Progress Log
 ### Session 1 — IDEATION
@@ -66,17 +66,52 @@ Phase: DEVELOPMENT
 - Health check tests passing (2/2)
 - Phase changed to DEVELOPMENT
 
+### Session 3 — FULL MVP IMPLEMENTATION
+- Implemented JWT auth with httponly cookies (register, login, logout, /me)
+  - Fixed JWT `sub` claim to use string (jose library requires string subjects)
+  - bcrypt password hashing via passlib
+- Built form CRUD API (create, list, get, update, delete)
+  - Plan-based form limits (free: 1, starter: 10, pro: unlimited)
+  - Owner-scoped access (users can only see/modify their own forms)
+- Implemented form submission endpoint (`POST /f/{form_uuid}`)
+  - Accepts JSON, URL-encoded, and multipart form data
+  - Per-form CORS configuration with preflight support
+  - Honeypot spam detection (`_gotcha` field)
+  - IP-based rate limiting (configurable per-minute limit)
+  - Custom redirect URLs or default thank-you page
+- Built full dashboard UI with Tailwind CSS
+  - Stats overview (total forms, submissions, plan)
+  - Form list with create/edit/delete modals
+  - Submission viewer with search, pagination, and data table
+  - Embeddable HTML snippet generator with copy-to-clipboard
+  - Empty states, loading states, toast notifications
+- Built public landing page with hero, features, how-it-works, and pricing
+- Built login/register pages with split-panel design
+- Added CSV export (dynamic column detection across all submissions)
+- Added email notification service (SMTP via aiosmtplib, HTML + plain text)
+- Wrote 40 comprehensive tests — all passing:
+  - Auth: register, login, logout, validation, duplicate detection
+  - Forms: CRUD, ownership isolation, plan limits
+  - Submissions: JSON/form-encoded, CORS, honeypot, redirects, pagination, search
+  - Export: CSV download, empty state, authorization
+- Created Dockerfile and docker-compose.yml
+- Created README with setup instructions, API docs, and configuration reference
+- Phase changed to QA
+
 ## Known Issues
-(none yet)
+(none)
 
 ## Files Structure
 ```
 form-forge/
 ├── CLAUDE.md
+├── README.md
 ├── .gitignore
 ├── .env.example
 ├── pyproject.toml
 ├── alembic.ini
+├── Dockerfile
+├── docker-compose.yml
 ├── alembic/
 │   ├── env.py
 │   ├── script.py.mako
@@ -84,18 +119,36 @@ form-forge/
 ├── src/
 │   └── app/
 │       ├── __init__.py
-│       ├── main.py          # FastAPI app, lifespan, health check
-│       ├── config.py         # Settings via pydantic-settings
-│       ├── database.py       # Async SQLAlchemy engine & session
-│       ├── models.py         # User, Form, Submission models
+│       ├── main.py              # FastAPI app, lifespan, routers, error handlers
+│       ├── config.py            # Settings via pydantic-settings
+│       ├── database.py          # Async SQLAlchemy engine & session
+│       ├── models.py            # User, Form, Submission models
+│       ├── auth.py              # JWT token creation, password hashing, auth deps
+│       ├── schemas.py           # Pydantic request/response schemas
+│       ├── email_service.py     # SMTP email notification sender
 │       ├── routers/
-│       │   └── __init__.py
+│       │   ├── __init__.py
+│       │   ├── auth.py          # Register, login, logout, /me endpoints
+│       │   ├── forms.py         # Form CRUD + submission listing API
+│       │   ├── submissions.py   # POST /f/{uuid} submission endpoint + CORS
+│       │   ├── export.py        # CSV export endpoint
+│       │   └── pages.py         # Jinja2 HTML page routes (dashboard, landing)
 │       ├── static/
 │       │   └── .gitkeep
 │       └── templates/
-│           └── .gitkeep
+│           ├── base.html         # Base template with Tailwind, toast system
+│           ├── landing.html      # Public landing page with pricing
+│           ├── login.html        # Login page
+│           ├── register.html     # Registration page
+│           ├── dashboard.html    # Dashboard with form management
+│           └── form_detail.html  # Submission viewer + snippet generator
 └── tests/
     ├── __init__.py
-    ├── conftest.py           # Test DB setup, async client fixture
-    └── test_health.py        # Health endpoint tests
+    ├── conftest.py              # Test DB setup, fixtures, rate limit reset
+    ├── helpers.py               # Test helper utilities
+    ├── test_health.py           # Health endpoint tests (2)
+    ├── test_auth.py             # Auth tests (10)
+    ├── test_forms.py            # Form CRUD tests (11)
+    ├── test_submissions.py      # Submission + spam tests (13)
+    └── test_export.py           # CSV export tests (4)
 ```

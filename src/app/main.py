@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
 from app.config import settings
 from app.database import engine, Base
+from app.routers import auth, forms, submissions, export, pages
 
 
 @asynccontextmanager
@@ -24,9 +25,25 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Static files and templates
+# Static files
 app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
-templates = Jinja2Templates(directory="src/app/templates")
+
+# Include routers
+app.include_router(auth.router)
+app.include_router(forms.router)
+app.include_router(submissions.router)
+app.include_router(export.router)
+app.include_router(pages.router)
+
+
+@app.exception_handler(401)
+async def unauthorized_redirect(request: Request, exc):
+    accept = request.headers.get("accept", "")
+    if "text/html" in accept and "application/json" not in accept:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/login", status_code=302)
+    detail = getattr(exc, "detail", "Not authenticated")
+    return JSONResponse(status_code=401, content={"detail": detail})
 
 
 @app.get("/health")

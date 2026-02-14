@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}FormForge — Instant Form Endpoints for Your Website{% endblock %}
+
+{% block body %}
+<!-- Nav -->
+<nav class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <span class="text-xl font-bold text-gray-900">FormForge</span>
+            </a>
+            <div class="flex items-center gap-4">
+                {% if user %}
+                <a href="/dashboard" class="text-sm font-medium text-gray-700 hover:text-brand-600 transition">Dashboard</a>
+                {% else %}
+                <a href="/login" class="text-sm font-medium text-gray-700 hover:text-brand-600 transition">Log in</a>
+                <a href="/register" class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition shadow-sm">Get Started Free</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-brand-50 via-white to-indigo-50"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+        <div class="text-center max-w-3xl mx-auto">
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-sm font-medium mb-6">
+                No server code needed
+            </div>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight">
+                Form endpoints<br>
+                <span class="text-brand-600">in seconds</span>
+            </h1>
+            <p class="mt-6 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
+                Point any HTML form at a FormForge endpoint. Submissions are captured, stored, and forwarded to your inbox. No backend required.
+            </p>
+            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/register" class="inline-flex items-center justify-center px-8 py-3.5 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 transition shadow-lg shadow-brand-200 text-base">
+                    Start for Free
+                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </a>
+                <a href="#how-it-works" class="inline-flex items-center justify-center px-8 py-3.5 bg-white text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition border border-gray-200 text-base">
+                    See How It Works
+                </a>
+            </div>
+        </div>
+
+        <!-- Code snippet preview -->
+        <div class="mt-16 max-w-2xl mx-auto">
+            <div class="bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
+                <div class="flex items-center gap-2 px-4 py-3 bg-gray-800">
+                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                    <span class="ml-2 text-gray-400 text-xs">index.html</span>
+                </div>
+                <pre class="p-6 text-sm text-gray-300 overflow-x-auto"><code>&lt;form action="<span class="text-brand-400">{{ settings.base_url }}/f/your-form-id</span>" method="POST"&gt;
+  &lt;input type="email" name="email" required&gt;
+  &lt;textarea name="message"&gt;&lt;/textarea&gt;
+  &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section id="how-it-works" class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-900">How it works</h2>
+            <p class="mt-4 text-lg text-gray-600">Three steps to collecting form submissions</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="text-center p-8">
+                <div class="w-14 h-14 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                    <span class="text-2xl font-bold text-brand-600">1</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Create an endpoint</h3>
+                <p class="text-gray-600">Sign up, create a form in your dashboard, and get a unique endpoint URL.</p>
+            </div>
+            <div class="text-center p-8">
+                <div class="w-14 h-14 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                    <span class="text-2xl font-bold text-brand-600">2</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Point your form</h3>
+                <p class="text-gray-600">Set the form action to your endpoint URL. Works with any HTML form.</p>
+            </div>
+            <div class="text-center p-8">
+                <div class="w-14 h-14 bg-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                    <span class="text-2xl font-bold text-brand-600">3</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Collect submissions</h3>
+                <p class="text-gray-600">View, search, and export submissions from your dashboard. Get email alerts.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="py-24 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-900">Everything you need</h2>
+            <p class="mt-4 text-lg text-gray-600">Powerful features, zero backend code</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% set features = [
+                ("Instant Endpoints", "Create form endpoints in seconds. Each gets a unique URL ready for any HTML form.", "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"),
+                ("Email Notifications", "Get notified instantly when a new submission arrives. Configurable per form.", "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"),
+                ("Spam Protection", "Built-in honeypot fields and rate limiting keep your inbox clean.", "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"),
+                ("CSV Export", "Export all submissions to CSV with one click. Perfect for analysis and reporting.", "M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"),
+                ("CORS Ready", "Configure allowed origins per form or allow all. Works with any frontend framework.", "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"),
+                ("Custom Redirects", "Send users to a custom thank-you page after submission. Fully configurable.", "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"),
+            ] %}
+            {% for name, desc, icon in features %}
+            <div class="bg-white rounded-xl p-6 border border-gray-200 hover:border-brand-200 hover:shadow-md transition">
+                <div class="w-10 h-10 bg-brand-50 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ icon }}"></path></svg>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">{{ name }}</h3>
+                <p class="text-sm text-gray-600">{{ desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-900">Simple, transparent pricing</h2>
+            <p class="mt-4 text-lg text-gray-600">Start free. Scale as you grow.</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <!-- Free -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-8">
+                <h3 class="text-lg font-semibold text-gray-900">Free</h3>
+                <div class="mt-4 flex items-baseline">
+                    <span class="text-4xl font-bold text-gray-900">$0</span>
+                    <span class="text-gray-500 ml-2">/month</span>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">Perfect for personal projects and testing.</p>
+                <ul class="mt-8 space-y-3">
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>1 form</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>50 submissions/month</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Spam protection</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Dashboard access</li>
+                </ul>
+                <a href="/register" class="mt-8 block w-full text-center px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition text-sm">Get Started</a>
+            </div>
+            <!-- Starter -->
+            <div class="bg-white rounded-2xl border-2 border-brand-600 p-8 relative shadow-lg">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 text-white text-xs font-semibold px-3 py-1 rounded-full">Most Popular</div>
+                <h3 class="text-lg font-semibold text-gray-900">Starter</h3>
+                <div class="mt-4 flex items-baseline">
+                    <span class="text-4xl font-bold text-gray-900">$9</span>
+                    <span class="text-gray-500 ml-2">/month</span>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">For growing sites and small businesses.</p>
+                <ul class="mt-8 space-y-3">
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>10 forms</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>1,000 submissions/month</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Email notifications</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>CSV export</li>
+                </ul>
+                <a href="/register" class="mt-8 block w-full text-center px-4 py-2.5 rounded-lg bg-brand-600 text-white font-medium hover:bg-brand-700 transition text-sm shadow-sm">Get Started</a>
+            </div>
+            <!-- Pro -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-8">
+                <h3 class="text-lg font-semibold text-gray-900">Pro</h3>
+                <div class="mt-4 flex items-baseline">
+                    <span class="text-4xl font-bold text-gray-900">$29</span>
+                    <span class="text-gray-500 ml-2">/month</span>
+                </div>
+                <p class="mt-4 text-sm text-gray-600">For agencies and high-traffic sites.</p>
+                <ul class="mt-8 space-y-3">
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Unlimited forms</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>10,000 submissions/month</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Custom redirects</li>
+                    <li class="flex items-center text-sm text-gray-600"><svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Priority support</li>
+                </ul>
+                <a href="/register" class="mt-8 block w-full text-center px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition text-sm">Get Started</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-brand-600 rounded flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <span class="text-white font-semibold">FormForge</span>
+            </div>
+            <p class="text-sm">&copy; 2026 FormForge. Open source &amp; self-hostable.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}

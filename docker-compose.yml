@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - formforge-data:/app/data
+    environment:
+      - FORMFORGE_SECRET_KEY=${FORMFORGE_SECRET_KEY:-change-me-in-production}
+      - FORMFORGE_BASE_URL=${FORMFORGE_BASE_URL:-http://localhost:8000}
+      - FORMFORGE_DATABASE_URL=sqlite+aiosqlite:///./data/formforge.db
+      - FORMFORGE_SMTP_HOST=${FORMFORGE_SMTP_HOST:-}
+      - FORMFORGE_SMTP_PORT=${FORMFORGE_SMTP_PORT:-587}
+      - FORMFORGE_SMTP_USER=${FORMFORGE_SMTP_USER:-}
+      - FORMFORGE_SMTP_PASSWORD=${FORMFORGE_SMTP_PASSWORD:-}
+      - FORMFORGE_SMTP_FROM_EMAIL=${FORMFORGE_SMTP_FROM_EMAIL:-noreply@formforge.dev}
+    restart: unless-stopped
+
+volumes:
+  formforge-data:
