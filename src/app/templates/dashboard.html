@@ -70,10 +70,16 @@
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
                     <a href="/dashboard/forms/{{ item.form.id }}" class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">View</a>
-                    <button onclick="openEditModal({{ item.form.id }}, '{{ item.form.name }}', '{{ item.form.allowed_origins }}', '{{ item.form.redirect_url or '' }}', {{ 'true' if item.form.email_notifications else 'false' }}, '{{ item.form.notification_email or '' }}')"
-                        class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition">Edit</button>
-                    <button onclick="deleteForm({{ item.form.id }}, '{{ item.form.name }}')"
-                        class="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition">Delete</button>
+                    <button class="edit-form-btn px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                        data-id="{{ item.form.id }}"
+                        data-name="{{ item.form.name | e }}"
+                        data-origins="{{ item.form.allowed_origins | e }}"
+                        data-redirect="{{ (item.form.redirect_url or '') | e }}"
+                        data-notifications="{{ 'true' if item.form.email_notifications else 'false' }}"
+                        data-notif-email="{{ (item.form.notification_email or '') | e }}">Edit</button>
+                    <button class="delete-form-btn px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
+                        data-id="{{ item.form.id }}"
+                        data-name="{{ item.form.name | e }}">Delete</button>
                 </div>
             </div>
         </div>
@@ -175,6 +181,26 @@ function openEditModal(id, name, origins, redirect, notifications, notifEmail) {
 function closeModal() {
     document.getElementById('form-modal').classList.add('hidden');
 }
+
+// Use event delegation for edit/delete buttons (safe from XSS via data attributes)
+document.addEventListener('click', (e) => {
+    const editBtn = e.target.closest('.edit-form-btn');
+    if (editBtn) {
+        openEditModal(
+            editBtn.dataset.id,
+            editBtn.dataset.name,
+            editBtn.dataset.origins,
+            editBtn.dataset.redirect,
+            editBtn.dataset.notifications === 'true',
+            editBtn.dataset.notifEmail
+        );
+        return;
+    }
+    const deleteBtn = e.target.closest('.delete-form-btn');
+    if (deleteBtn) {
+        deleteForm(deleteBtn.dataset.id, deleteBtn.dataset.name);
+    }
+});
 
 document.getElementById('form-form').addEventListener('submit', async (e) => {
     e.preventDefault();

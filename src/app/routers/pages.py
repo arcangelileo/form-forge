@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -12,13 +13,14 @@ from app.database import get_db
 from app.models import Form, Submission, User
 
 router = APIRouter(tags=["pages"])
-templates = Jinja2Templates(directory="src/app/templates")
+_TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
+templates = Jinja2Templates(directory=str(_TEMPLATES_DIR))
 
 
 @router.get("/", response_class=HTMLResponse)
 async def landing_page(request: Request, user: User | None = Depends(get_optional_user)):
     return templates.TemplateResponse(
-        "landing.html", {"request": request, "user": user, "settings": settings}
+        request, "landing.html", {"user": user, "settings": settings}
     )
 
 
@@ -26,14 +28,14 @@ async def landing_page(request: Request, user: User | None = Depends(get_optiona
 async def login_page(request: Request, user: User | None = Depends(get_optional_user)):
     if user:
         return RedirectResponse(url="/dashboard", status_code=302)
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse(request, "login.html")
 
 
 @router.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request, user: User | None = Depends(get_optional_user)):
     if user:
         return RedirectResponse(url="/dashboard", status_code=302)
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse(request, "register.html")
 
 
 @router.get("/dashboard", response_class=HTMLResponse)
@@ -60,9 +62,9 @@ async def dashboard_page(
         form_data.append({"form": form, "submission_count": count})
 
     return templates.TemplateResponse(
+        request,
         "dashboard.html",
         {
-            "request": request,
             "user": user,
             "forms": form_data,
             "total_forms": len(forms),
@@ -117,9 +119,9 @@ async def form_detail_page(
     total_pages = max(1, (total + per_page - 1) // per_page)
 
     return templates.TemplateResponse(
+        request,
         "form_detail.html",
         {
-            "request": request,
             "user": user,
             "form": form,
             "submissions": submissions,

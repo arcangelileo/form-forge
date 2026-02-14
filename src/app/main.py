@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -7,6 +8,10 @@ from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database import engine, Base
 from app.routers import auth, forms, submissions, export, pages
+
+# Resolve paths relative to this file so they work from any working directory
+_APP_DIR = Path(__file__).resolve().parent
+_STATIC_DIR = _APP_DIR / "static"
 
 
 @asynccontextmanager
@@ -26,7 +31,7 @@ app = FastAPI(
 )
 
 # Static files
-app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
+app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
 
 # Include routers
 app.include_router(auth.router)

@@ -1,6 +1,6 @@
 # FormForge
 
-Phase: QA
+Phase: DEPLOYMENT
 
 ## Project Spec
 - **Repo**: https://github.com/arcangelileo/form-forge
@@ -98,6 +98,28 @@ Phase: QA
 - Created README with setup instructions, API docs, and configuration reference
 - Phase changed to QA
 
+### Session 4 — QA & POLISH
+- **Initial test run**: All 40 existing tests passed
+- **Full code audit** of every source file and template
+- **Bugs found and fixed**:
+  1. **XSS in email notifications** — User-submitted form data was injected directly into HTML emails without escaping. Fixed by using `html.escape()` on all user content in `email_service.py`
+  2. **XSS in dashboard edit modal** — Form names with quotes/apostrophes broke inline `onclick` handlers. Replaced unsafe inline JS with `data-*` attributes and event delegation in `dashboard.html`
+  3. **Hardcoded static files path** — `main.py` used `directory="src/app/static"` which would fail in Docker. Fixed to use `Path(__file__)` relative resolution
+  4. **Hardcoded templates path** — `pages.py` used `directory="src/app/templates"` which would fail in Docker. Fixed to use `Path(__file__)` relative resolution
+  5. **Email notifications never sent** — `submit_form()` in `submissions.py` never called `send_submission_notification`. Wired up fire-and-forget async task via `asyncio.create_task()`
+  6. **Deprecated TemplateResponse API** — Fixed `TemplateResponse(name, {request: ...})` to `TemplateResponse(request, name, {})` to eliminate deprecation warnings
+- **UI polish**:
+  - Added SVG favicon to all pages via `base.html`
+  - Enhanced thank-you page with gradient background, checkmark icon, powered-by branding
+  - Added CTA section before footer on landing page
+  - Added "How it works" and "Pricing" nav links to landing page header and footer
+  - Added smooth scrolling for anchor links
+- **Test coverage expanded** (40 → 54 tests):
+  - `test_pages.py` (12 tests): Landing page rendering, login/register redirects, dashboard auth guard, dashboard rendering with/without forms, form detail page with submissions, 404 handling
+  - `test_rate_limit.py` (2 tests): Rate limiting enforcement, per-form rate limit isolation
+- **Final result**: 54 tests, all passing, zero warnings
+- Phase changed to DEPLOYMENT
+
 ## Known Issues
 (none)
 
@@ -150,5 +172,7 @@ form-forge/
     ├── test_auth.py             # Auth tests (10)
     ├── test_forms.py            # Form CRUD tests (11)
     ├── test_submissions.py      # Submission + spam tests (13)
-    └── test_export.py           # CSV export tests (4)
+    ├── test_export.py           # CSV export tests (4)
+    ├── test_pages.py            # Page rendering tests (12)
+    └── test_rate_limit.py       # Rate limiting tests (2)
 ```

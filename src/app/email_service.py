@@ -1,4 +1,4 @@
-import json
+import html
 import logging
 
 from app.config import settings
@@ -20,19 +20,22 @@ async def send_submission_notification(
         from email.mime.text import MIMEText
         from email.mime.multipart import MIMEMultipart
 
-        # Build a clean HTML email
+        # Build a clean HTML email (escape all user-provided content)
         fields_html = ""
         for key, value in submission_data.items():
+            safe_key = html.escape(str(key))
+            safe_value = html.escape(str(value))
             fields_html += f"""
             <tr>
-                <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#374151;width:30%;vertical-align:top;">{key}</td>
-                <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#1f2937;">{value}</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#374151;width:30%;vertical-align:top;">{safe_key}</td>
+                <td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;color:#1f2937;">{safe_value}</td>
             </tr>"""
 
+        safe_form_name = html.escape(str(form_name))
         html_body = f"""
         <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;">
             <div style="background:#2563eb;color:white;padding:20px 24px;border-radius:8px 8px 0 0;">
-                <h2 style="margin:0;font-size:18px;">New Submission: {form_name}</h2>
+                <h2 style="margin:0;font-size:18px;">New Submission: {safe_form_name}</h2>
             </div>
             <div style="background:white;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;padding:0;">
                 <table style="width:100%;border-collapse:collapse;">{fields_html}</table>

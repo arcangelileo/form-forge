@@ -1,4 +1,6 @@
+import asyncio
 import json
+import logging
 import time
 from collections import defaultdict
 
@@ -9,7 +11,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.database import get_db
+from app.email_service import send_submission_notification
 from app.models import Form, Submission
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["submissions"])
 
@@ -143,6 +148,16 @@ async def submit_form(
     db.add(submission)
     await db.commit()
 
+    # Send email notification (fire-and-forget, don't block the response)
+    if not is_spam and form.email_notifications and form.notification_email:
+        asyncio.create_task(
+            send_submission_notification(
+                to_email=form.notification_email,
+                form_name=form.name,
+                submission_data=clean_data,
+            )
+        )
+
     cors_headers = _check_cors(form, request)
 
     # Determine response based on accept header and redirect URL
@@ -158,12 +173,28 @@ async def submit_form(
 
     if "text/html" in accept and "application/json" not in accept:
         html = """<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Thank you!</title>
-<style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f8fafc;}
-.card{text-align:center;padding:3rem;background:white;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
-h1{color:#0f172a;margin:0 0 0.5rem;}p{color:#64748b;margin:0;}</style></head>
-<body><div class="card"><h1>Thank you!</h1><p>Your submission has been received.</p></div></body>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thank you!</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:linear-gradient(135deg,#eff6ff 0%,#f8fafc 50%,#eef2ff 100%);}
+.card{text-align:center;padding:3rem 2.5rem;background:white;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.06);max-width:420px;width:90%;}
+.icon{width:64px;height:64px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;}
+.icon svg{width:32px;height:32px;color:#16a34a;}
+h1{color:#0f172a;margin:0 0 0.5rem;font-size:1.5rem;font-weight:700;}
+p{color:#64748b;margin:0;font-size:0.95rem;line-height:1.5;}
+.powered{margin-top:2rem;font-size:0.75rem;color:#94a3b8;}
+.powered a{color:#3b82f6;text-decoration:none;}
+</style></head>
+<body>
+<div class="card">
+  <div class="icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+  <h1>Thank you!</h1>
+  <p>Your submission has been received successfully. We'll be in touch soon.</p>
+  <p class="powered">Powered by <a href="/">FormForge</a></p>
+</div>
+</body>
 </html>"""
         return HTMLResponse(content=html, headers=cors_headers)
 
