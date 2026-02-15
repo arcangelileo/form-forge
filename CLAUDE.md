@@ -1,6 +1,6 @@
 # FormForge
 
-Phase: DEPLOYMENT
+Phase: COMPLETE
 
 ## Project Spec
 - **Repo**: https://github.com/arcangelileo/form-forge
@@ -119,6 +119,30 @@ Phase: DEPLOYMENT
   - `test_rate_limit.py` (2 tests): Rate limiting enforcement, per-form rate limit isolation
 - **Final result**: 54 tests, all passing, zero warnings
 - Phase changed to DEPLOYMENT
+
+### Session 5 — DEPLOYMENT & FINALIZATION
+- **Dockerfile**: Rebuilt as multi-stage build (builder + runtime) for smaller image size
+  - Non-root `formforge` user for security
+  - `HEALTHCHECK` via curl to `/health`
+  - Exec-form `CMD` for proper PID 1 signal handling
+  - Installed curl in runtime stage for health checks
+- **docker-compose.yml**: Updated with all environment variables, configurable host port
+- **.env.example**: Expanded with section headers, inline documentation, secret key generation command, and `FORMFORGE_PORT` for Docker Compose
+- **README.md**: Comprehensive rewrite with:
+  - Feature list, quick start (Docker one-liner, Compose, local dev)
+  - Full usage walkthrough (HTML form + JavaScript examples)
+  - Complete API reference (auth, forms, submissions, export, health)
+  - Configuration table with all env vars
+  - SMTP provider examples (SendGrid, Mailgun)
+  - Architecture diagram and key design decisions
+  - Project structure tree
+  - Pricing tiers table
+  - Contributing guidelines
+- **Code cleanup**:
+  - Removed unused imports (`Request` from `routers/auth.py`, `status` from `routers/pages.py`)
+  - Added ruff `E712` ignore for SQLAlchemy boolean column comparisons
+  - All 54 tests passing, ruff lint clean
+- Phase changed to COMPLETE
 
 ## Known Issues
 (none)
